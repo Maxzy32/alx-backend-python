@@ -34,7 +34,7 @@ class TestAccessNestedMap(unittest.TestCase):
         self.assertEqual(str(cm.exception), f"'{path[-1]}'")    
 
 
-     
+
 class TestGetJson(unittest.TestCase):
     """ Unit test for get_json """
 
