@@ -7,6 +7,7 @@ from parameterized import parameterized
 from utils import access_nested_map
 from utils import get_json
 from unittest.mock import patch, Mock
+import utils 
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -36,6 +37,24 @@ class TestAccessNestedMap(unittest.TestCase):
 
 
 
+# class TestGetJson(unittest.TestCase):
+#     def test_get_json(self):
+#         test_cases = [
+#             ("http://example.com", {"payload": True}),
+#             ("http://holberton.io", {"payload": False}),
+#         ]
+
+#         for test_url, test_payload in test_cases:
+#             with patch("utils.requests.get") as mock_get:
+#                 mock_response = Mock()
+#                 mock_response.json.return_value = test_payload
+#                 mock_get.return_value = mock_response
+
+#                 result = get_json(test_url)
+
+#                 mock_get.assert_called_once_with(test_url)
+#                 self.assertEqual(result, test_payload)
+
 class TestGetJson(unittest.TestCase):
     def test_get_json(self):
         test_cases = [
@@ -44,12 +63,12 @@ class TestGetJson(unittest.TestCase):
         ]
 
         for test_url, test_payload in test_cases:
-            with patch("utils.requests.get") as mock_get:
+            with patch("utils.requests.get") as mock_get:  # 👈 exact path
                 mock_response = Mock()
                 mock_response.json.return_value = test_payload
                 mock_get.return_value = mock_response
 
-                result = get_json(test_url)
+                result = utils.get_json(test_url)
 
                 mock_get.assert_called_once_with(test_url)
                 self.assertEqual(result, test_payload)
