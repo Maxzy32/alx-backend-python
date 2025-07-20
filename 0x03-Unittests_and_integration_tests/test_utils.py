@@ -36,17 +36,28 @@ class TestAccessNestedMap(unittest.TestCase):
 
      
 class TestGetJson(unittest.TestCase):
+    """
+    Unit tests for get_json
+    """
+
     @parameterized.expand([
         ("http://example.com", {"payload": True}),
         ("http://holberton.io", {"payload": False}),
     ])
-    @patch('utils.requests.get')
+    @patch('utils.requests.get')  # ✅ This is the required decorator
     def test_get_json(self, test_url, test_payload, mock_get):
+        """
+        Test that get_json returns expected payload from given URL
+        and mock was called exactly once with the URL
+        """
+        # Setup the mock response
         mock_response = Mock()
         mock_response.json.return_value = test_payload
         mock_get.return_value = mock_response
 
+        # Call the function
         result = get_json(test_url)
 
+        # Assertions
         mock_get.assert_called_once_with(test_url)
         self.assertEqual(result, test_payload)
