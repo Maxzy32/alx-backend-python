@@ -216,35 +216,33 @@ from fixtures import TEST_PAYLOAD
     }
 ])
 class TestIntegrationGithubOrgClient(unittest.TestCase):
-    """Integration tests for GithubOrgClient.public_repos"""
+    """Integration test class"""
 
-    @classmethod
-    def setUpClass(cls):
-        """Set up mock for requests.get"""
-        cls.get_patcher = patch('requests.get')
-        cls.mock_get = cls.get_patcher.start()
+    def setUp(self):
+        """Start patcher and assign self.get_patcher"""
+        self.get_patcher = patch('requests.get')
+        self.mock_get = self.get_patcher.start()
 
         def side_effect(url):
             if url == "https://api.github.com/orgs/google":
-                return MockResponse(cls.org_payload)
+                return MockResponse(self.org_payload)
             elif url == "https://api.github.com/orgs/google/repos":
-                return MockResponse(cls.repos_payload)
+                return MockResponse(self.repos_payload)
             return None
 
-        cls.mock_get.side_effect = side_effect
+        self.mock_get.side_effect = side_effect
 
-    @classmethod
-    def tearDownClass(cls):
-        """Stop the patcher"""
-        cls.get_patcher.stop()
+    def tearDown(self):
+        """Stop patcher"""
+        self.get_patcher.stop()
 
     def test_public_repos(self):
-        """Test that public_repos returns expected repository names"""
+        """Test all public repos"""
         client = GithubOrgClient("google")
         self.assertEqual(client.public_repos(), self.expected_repos)
 
     def test_public_repos_with_license(self):
-        """Test public_repos filtered by license"""
+        """Test filtered repos by license"""
         client = GithubOrgClient("google")
         self.assertEqual(
             client.public_repos(license="apache-2.0"),
@@ -253,9 +251,9 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
 
 class MockResponse:
-    """Mock class for requests.get() response"""
-    def __init__(self, json_data):
-        self._json = json_data
+    """Mock response object"""
+    def __init__(self, payload):
+        self._json = payload
 
     def json(self):
         return self._json
