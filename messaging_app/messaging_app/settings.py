@@ -40,9 +40,12 @@ INSTALLED_APPS = [
     # Third-party
     'rest_framework',
 
-    
+    # Local
+    'chats',
 
 ]
+
+AUTH_USER_MODEL = 'chats.User'  # ✅ Add this here
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
