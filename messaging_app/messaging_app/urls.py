@@ -16,7 +16,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from rest_framework_nested.routers import NestedDefaultRouter
+from messaging_app.chats.views import ConversationViewSet, MessageViewSet
+
+router = DefaultRouter()
+router.register(r'conversations', ConversationViewSet, basename='conversations')
+
+# Nested router for messages
+conversation_router = NestedDefaultRouter(router, r'conversations', lookup='conversation')
+conversation_router.register(r'messages', MessageViewSet, basename='conversation-messages')
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include(router.urls)),
+    path('', include(conversation_router.urls)),
 ]
