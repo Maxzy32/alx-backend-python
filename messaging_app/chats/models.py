@@ -11,7 +11,7 @@ class User(AbstractUser):
         ('admin', 'Admin'),
     )
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
+    user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
     email = models.EmailField(unique=True, null=False)
     password_hash = models.CharField(max_length=255, null=False)
     phone_number = models.CharField(max_length=20, null=True, blank=True)
@@ -27,17 +27,17 @@ class User(AbstractUser):
 
 class Conversation(models.Model):
     """Conversation between two or more users."""
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
+    conversation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
     participants = models.ManyToManyField(User, related_name='conversations')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Conversation {self.id}"
+        return f"Conversation {self.conversation_id}"
 
 
 class Message(models.Model):
     """Message model for chat system."""
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
+    message_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
     message_body = models.TextField(null=False)
@@ -45,4 +45,3 @@ class Message(models.Model):
 
     def __str__(self):
         return f"From {self.sender.email}: {self.message_body[:30]}..."
-# Create your models here.
