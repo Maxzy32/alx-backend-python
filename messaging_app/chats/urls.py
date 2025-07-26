@@ -4,6 +4,7 @@ from rest_framework import routers  # ✅ ALX requires this import explicitly
 from rest_framework_nested.routers import NestedDefaultRouter
 from .views import ConversationViewSet, MessageViewSet
 
+
 router = routers.DefaultRouter()
 router.register(r'conversations', ConversationViewSet, basename='conversations')
 

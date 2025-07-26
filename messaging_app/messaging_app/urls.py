@@ -17,10 +17,12 @@ Including another URLconf
 # messaging_app/urls.py
 from django.contrib import admin
 from django.urls import path, include
+from messaging_app.chats import auth
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('chats.urls')),  # Your conversations/messages endpoints
-    path('api-auth/', include('rest_framework.urls')),  # ✅ For DRF login/logout UI
+    # path('api-auth/', include('rest_framework.urls')),  # ✅ For DRF login/logout UI
+     path('api/auth/', include(auth)),
 ]
 
