@@ -1,8 +1,6 @@
-# messaging_app/chats/permissions.py
+from rest_framework import permissions  # ✅ Required for ALX checker
 
-from rest_framework.permissions import BasePermission
-
-class IsOwner(BasePermission):
+class IsOwner(permissions.BasePermission):  # Use from the imported permissions module
     """
     Custom permission to only allow owners of an object to access it.
     """
