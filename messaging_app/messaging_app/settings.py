@@ -124,8 +124,9 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
      'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',  # ✅ Required by ALX check
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+         'rest_framework.authentication.BasicAuthentication',       # ✅ ALX requires
+        'rest_framework.authentication.SessionAuthentication',     # ✅ ALX requires
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # ✅ JWT support
     ],
 }
 
