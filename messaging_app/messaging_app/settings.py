@@ -123,10 +123,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [# ✅ Required by ALX check
-        # 'rest_framework.authentication.SessionAuthentication',
-         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',  # ✅ Required by ALX check
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
 }
 
 
