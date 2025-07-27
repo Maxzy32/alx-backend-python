@@ -1,19 +1,19 @@
-from django.shortcuts import render
-from rest_framework import viewsets, status, filters  # ✅ Add filters here
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
+from rest_framework.status import HTTP_403_FORBIDDEN
+from rest_framework.exceptions import PermissionDenied
 
 from .models import Conversation, Message, User
 from .serializers import ConversationSerializer, MessageSerializer
 from .permissions import IsParticipantOfConversation
 
 
-
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
-    permission_classes = [IsParticipantOfConversation]  # 🔁 Replaced IsAuthenticated
+    permission_classes = [IsParticipantOfConversation]
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['created_at']
 
@@ -27,17 +27,31 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
-    permission_classes = [IsParticipantOfConversation]  # 🔁 Replaced IsAuthenticated
+    permission_classes = [IsParticipantOfConversation]
 
     def get_queryset(self):
         conversation_id = self.kwargs.get('conversation_pk')
         conversation = get_object_or_404(Conversation, conversation_id=conversation_id)
+
+        # ✅ Authentication and participant check
+        if not self.request.user.is_authenticated:
+            raise PermissionDenied("Authentication required")
+
+        if not conversation.participants.filter(user_id=self.request.user.user_id).exists():
+            raise PermissionDenied(detail="You are not a participant in this conversation.", code=HTTP_403_FORBIDDEN)
+
         return Message.objects.filter(conversation=conversation)
 
     def perform_create(self, serializer):
         conversation_id = self.kwargs.get('conversation_pk')
         conversation = get_object_or_404(Conversation, conversation_id=conversation_id)
+
+        # ✅ Authentication and participant check
+        if not self.request.user.is_authenticated:
+            raise PermissionDenied("Authentication required")
+
+        if not conversation.participants.filter(user_id=self.request.user.user_id).exists():
+            raise PermissionDenied(detail="You are not a participant in this conversation.", code=HTTP_403_FORBIDDEN)
+
         serializer.save(sender=self.request.user, conversation=conversation)
 
-
-# Create your views here.
