@@ -1,9 +1,14 @@
-from rest_framework import permissions  # ✅ Required for ALX checker
+from rest_framework import permissions
 
-class IsOwner(permissions.BasePermission):  # Use from the imported permissions module
+
+class IsParticipantOfConversation(permissions.BasePermission):
     """
-    Custom permission to only allow owners of an object to access it.
+    Custom permission to allow only participants of a conversation to view or modify it.
     """
 
     def has_object_permission(self, request, view, obj):
-        return obj.user == request.user
+        # For message-level permissions (obj is a Message)
+        return request.user in obj.conversation.participants.all()
+
+    def has_permission(self, request, view):
+        return request.user and request.user.is_authenticated

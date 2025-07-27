@@ -6,14 +6,19 @@ from django.shortcuts import get_object_or_404
 
 from .models import Conversation, Message, User
 from .serializers import ConversationSerializer, MessageSerializer
+from .permissions import IsParticipantOfConversation
+
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [filters.OrderingFilter]  # ✅ Add this to use filters
+    permission_classes = [IsParticipantOfConversation]  # 🔁 Replaced IsAuthenticated
+    filter_backends = [filters.OrderingFilter]
     ordering_fields = ['created_at']
+
+    def get_queryset(self):
+        return Conversation.objects.filter(participants=self.request.user)
 
     def perform_create(self, serializer):
         conversation = serializer.save()
@@ -22,7 +27,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsParticipantOfConversation]  # 🔁 Replaced IsAuthenticated
 
     def get_queryset(self):
         conversation_id = self.kwargs.get('conversation_pk')
