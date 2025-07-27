@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
     # Local
     'chats',
+     'django_filters',
 
 ]
 
@@ -127,6 +128,12 @@ REST_FRAMEWORK = {
          'rest_framework.authentication.BasicAuthentication',       # ✅ ALX requires
         'rest_framework.authentication.SessionAuthentication',     # ✅ ALX requires
         'rest_framework_simplejwt.authentication.JWTAuthentication',  # ✅ JWT support
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'chats.pagination.StandardResultsSetPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.OrderingFilter',
     ],
 }
 

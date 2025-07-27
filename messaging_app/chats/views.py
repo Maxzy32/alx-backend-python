@@ -8,6 +8,9 @@ from rest_framework.exceptions import PermissionDenied
 from .models import Conversation, Message, User
 from .serializers import ConversationSerializer, MessageSerializer
 from .permissions import IsParticipantOfConversation
+from .filters import MessageFilter
+from .pagination import StandardResultsSetPagination
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -28,12 +31,15 @@ class ConversationViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     permission_classes = [IsParticipantOfConversation]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]  # ✅ Fix indentation here
+    filterset_class = MessageFilter
+    pagination_class = StandardResultsSetPagination
+    ordering_fields = ['sent_at']
 
     def get_queryset(self):
         conversation_id = self.kwargs.get('conversation_pk')
         conversation = get_object_or_404(Conversation, conversation_id=conversation_id)
 
-        # ✅ Authentication and participant check
         if not self.request.user.is_authenticated:
             raise PermissionDenied("Authentication required")
 
@@ -46,7 +52,6 @@ class MessageViewSet(viewsets.ModelViewSet):
         conversation_id = self.kwargs.get('conversation_pk')
         conversation = get_object_or_404(Conversation, conversation_id=conversation_id)
 
-        # ✅ Authentication and participant check
         if not self.request.user.is_authenticated:
             raise PermissionDenied("Authentication required")
 
