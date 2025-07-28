@@ -15,14 +15,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 # messaging_app/urls.py
+from django.http import JsonResponse
 from django.contrib import admin
 from django.urls import path, include
-from chats import auth
+from chats.auth import urlpatterns as auth_urlpatterns
+
+
+def root_view(request):
+    return JsonResponse({"message": "Welcome to the Messaging API"})
 
 urlpatterns = [
+    path('', root_view),  # <--- add this line
     path('admin/', admin.site.urls),
-    path('api/', include('chats.urls')),  # Your conversations/messages endpoints
-    # path('api-auth/', include('rest_framework.urls')),  # ✅ For DRF login/logout UI
-     path('api/auth/', include(auth)),
+    path('api/', include('chats.urls')),
+    path('api/auth/', include(auth_urlpatterns)),
 ]
 

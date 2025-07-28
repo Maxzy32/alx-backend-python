@@ -2,7 +2,9 @@
 from django.urls import path, include
 from rest_framework import routers  # ✅ ALX requires this import explicitly
 from rest_framework_nested.routers import NestedDefaultRouter
-from .views import ConversationViewSet, MessageViewSet
+# from .views import ConversationViewSet, MessageViewSet
+from chats.views import ConversationViewSet, MessageViewSet
+
 
 
 router = routers.DefaultRouter()
