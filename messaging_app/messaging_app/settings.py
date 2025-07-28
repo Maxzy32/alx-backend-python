@@ -132,8 +132,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'chats.pagination.StandardResultsSetPagination',
     'PAGE_SIZE': 20,
     'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend',
-        'rest_framework.filters.OrderingFilter',
+        'django_filters.rest_framework.DjangoFilterBackend'
     ],
 }
 
