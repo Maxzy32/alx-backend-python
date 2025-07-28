@@ -129,10 +129,10 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',     # ✅ ALX requires
         'rest_framework_simplejwt.authentication.JWTAuthentication',  # ✅ JWT support
     ],
-    'DEFAULT_PAGINATION_CLASS': 'chats.pagination.StandardResultsSetPagination',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',  # <- ALX expects this literal class
     'PAGE_SIZE': 20,
     'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend'
+        'django_filters.rest_framework.DjangoFilterBackend',
     ],
 }
 
