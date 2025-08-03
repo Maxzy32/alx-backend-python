@@ -3,8 +3,7 @@ from django.dispatch import receiver
 from .models import Message, Notification
 
 from .models import Message, MessageHistory
-
-
+from django.db.models.signals import post_delete
 
 
 @receiver(post_save, sender=Message)
@@ -24,3 +23,15 @@ def log_message_edit(sender, instance, **kwargs):
                 )
         except Message.DoesNotExist:
             pass
+
+@receiver(post_delete, sender=User)
+def cleanup_user_data(sender, instance, **kwargs):
+    # Delete messages where user was sender or receiver
+    Message.objects.filter(sender=instance).delete()
+    Message.objects.filter(receiver=instance).delete()
+
+    # Delete notifications
+    Notification.objects.filter(user=instance).delete()
+
+    # Delete message history where user was the sender of the original message
+    MessageHistory.objects.filter(original_message__sender=instance).delete()        
