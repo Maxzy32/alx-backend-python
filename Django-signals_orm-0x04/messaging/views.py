@@ -52,3 +52,11 @@ def get_threaded_replies(request, message_id):
     all_replies = fetch_replies(message)
     serialized = MessageSerializer([message] + all_replies, many=True)
     return Response(serialized.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def unread_messages(request):
+    user = request.user
+    unread = Message.unread.for_user(user)
+    serialized = MessageSerializer(unread, many=True)
+    return Response(serialized.data)
