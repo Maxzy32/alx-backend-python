@@ -13,8 +13,26 @@ class Message(models.Model):
     edited_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='edited_messages')
 
 
+ # Threading support
+    parent_message = models.ForeignKey(
+        'self',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='replies'
+    )
+
     def __str__(self):
-        return f"From {self.sender} to {self.receiver}"
+        return f"From {self.sender} ➜ {self.receiver} ({self.timestamp})"
+
+    def get_all_replies(self):
+        """Recursively fetch all replies to this message"""
+        replies = []
+        for reply in self.replies.all():
+            replies.append(reply)
+            replies.extend(reply.get_all_replies())
+        return replies
+    
 
 
 class Notification(models.Model):
