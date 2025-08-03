@@ -45,3 +45,5 @@ class Message(models.Model):
 
     def __str__(self):
         return f"From {self.sender.email}: {self.message_body[:30]}..."
+    
+    
