@@ -70,6 +70,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 
+from django.views.decorators.cache import cache_page  # ✅ cache import
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -92,18 +93,17 @@ class MessageViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # ✅ Contains .filter() and .only()
         return Message.objects.select_related('sender', 'receiver', 'parent_message') \
                               .prefetch_related('replies') \
                               .filter(receiver=self.request.user)
 
     def perform_create(self, serializer):
-        # ✅ Contains sender=self.request.user
         serializer.save(sender=self.request.user)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@cache_page(60)  # ✅ Cache this view for 60 seconds
 def get_threaded_replies(request, message_id):
     """Return a message and all replies recursively"""
     message = get_object_or_404(Message, id=message_id)
@@ -122,8 +122,9 @@ def get_threaded_replies(request, message_id):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@cache_page(60)  # ✅ Cache this view for 60 seconds as required
 def unread_messages(request):
     user = request.user
-    unread = Message.unread.unread_for_user(user)  # .only used in manager
+    unread = Message.unread.unread_for_user(user)  # already uses .only()
     serialized = MessageSerializer(unread, many=True)
     return Response(serialized.data)
