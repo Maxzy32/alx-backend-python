@@ -1,0 +1,5 @@
+# Install Nginx Ingress Controller (Minikube)
+minikube addons enable ingress
+
+# Apply Ingress configuration
+kubectl apply -f messaging_app/ingress.yaml
