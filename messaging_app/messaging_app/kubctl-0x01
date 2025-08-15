@@ -1,0 +1,32 @@
+#!/bin/bash
+# kubctl-0x01 - Scale Django app in Kubernetes and test load handling
+
+set -e
+
+DEPLOYMENT_NAME="messaging-app-deployment"
+SERVICE_NAME="messaging-app-service"
+NAMESPACE="default"
+
+echo "==== Scaling Kubernetes Deployment to 3 replicas ===="
+kubectl scale deployment "$DEPLOYMENT_NAME" --replicas=3 --namespace="$NAMESPACE"
+
+echo "==== Waiting for pods to become ready ===="
+kubectl rollout status deployment/"$DEPLOYMENT_NAME" --namespace="$NAMESPACE"
+
+echo "==== Verifying running pods ===="
+kubectl get pods --namespace="$NAMESPACE" -o wide
+
+echo "==== Running load test using wrk ===="
+# Get the ClusterIP of the service
+SERVICE_IP=$(kubectl get svc "$SERVICE_NAME" --namespace="$NAMESPACE" -o jsonpath='{.spec.clusterIP}')
+SERVICE_PORT=$(kubectl get svc "$SERVICE_NAME" --namespace="$NAMESPACE" -o jsonpath='{.spec.ports[0].port}')
+
+echo "Service is running at ${SERVICE_IP}:${SERVICE_PORT}"
+
+# Run wrk load test (adjust URL path to your Django app endpoint)
+wrk -t2 -c100 -d30s http://${SERVICE_IP}:${SERVICE_PORT}/
+
+echo "==== Monitoring resource usage ===="
+kubectl top pods --namespace="$NAMESPACE"
+
+echo "==== Scaling and load test completed successfully ===="
