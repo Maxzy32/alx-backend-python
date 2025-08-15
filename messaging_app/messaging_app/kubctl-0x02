@@ -1,0 +1,26 @@
+#!/bin/bash
+# kubctl-0x02 - Deploy Blue-Green versions and check logs for the green version
+
+set -e
+
+echo "==== Deploying Blue version of the app ===="
+kubectl apply -f messaging_app/blue_deployment.yaml
+
+echo "==== Deploying Green version of the app ===="
+kubectl apply -f messaging_app/green_deployment.yaml
+
+echo "==== Applying Service (currently pointing to Blue) ===="
+kubectl apply -f messaging_app/kubeservice.yaml
+
+echo "==== Waiting for all pods to be ready ===="
+kubectl rollout status deployment/messaging-app-blue
+kubectl rollout status deployment/messaging-app-green
+
+echo "==== Checking logs for the Green version ===="
+GREEN_POD=$(kubectl get pods -l app=messaging-app,version=green -o jsonpath='{.items[0].metadata.name}')
+kubectl logs "$GREEN_POD"
+
+echo "==== Blue-Green deployments complete. Traffic is still on Blue. ===="
+echo "To switch traffic to Green:"
+echo "  1. Edit kubeservice.yaml, change version selector from 'blue' to 'green'."
+echo "  2. Run: kubectl apply -f messaging_app/kubeservice.yaml"
