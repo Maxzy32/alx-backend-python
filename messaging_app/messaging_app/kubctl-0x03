@@ -1,0 +1,37 @@
+#!/bin/bash
+# kubctl-0x03 - Perform a rolling update of the Blue deployment without downtime
+
+set -e
+
+DEPLOYMENT_NAME="messaging-app-blue"
+SERVICE_NAME="messaging-app-service"
+NAMESPACE="default"
+
+echo "==== Applying updated deployment (Rolling Update) ===="
+kubectl apply -f messaging_app/blue_deployment.yaml
+
+echo "==== Monitoring rollout status ===="
+kubectl rollout status deployment/"$DEPLOYMENT_NAME" --namespace="$NAMESPACE" &
+
+# Continuous curl to test downtime
+echo "==== Sending continuous requests to check for downtime ===="
+SERVICE_IP=$(kubectl get svc "$SERVICE_NAME" --namespace="$NAMESPACE" -o jsonpath='{.spec.clusterIP}')
+SERVICE_PORT=$(kubectl get svc "$SERVICE_NAME" --namespace="$NAMESPACE" -o jsonpath='{.spec.ports[0].port}')
+
+# Run curl in a loop for 20 seconds
+END=$((SECONDS+20))
+while [ $SECONDS -lt $END ]; do
+    if curl -s --max-time 2 http://${SERVICE_IP}:${SERVICE_PORT}/ > /dev/null; then
+        echo "$(date +"%H:%M:%S") - Request OK"
+    else
+        echo "$(date +"%H:%M:%S") - Request FAILED"
+    fi
+    sleep 1
+done
+
+wait
+
+echo "==== Verifying current pods after update ===="
+kubectl get pods --namespace="$NAMESPACE" -o wide
+
+echo "==== Rolling update complete ===="
